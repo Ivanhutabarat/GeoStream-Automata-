@@ -7,7 +7,7 @@ from core.visualizer_engine import VisualizerEngine
 from core.sync_manager import SyncManager
 from whatsapp_bot_main import GeoBot
 
-# Inisialisasi
+# Inisialisasi Colorama agar warna muncul di Termux
 init(autoreset=True)
 
 def show_banner():
@@ -19,16 +19,16 @@ def show_banner():
 
 def main_menu():
     show_banner()
-    print(f"{Fore.GREEN}[1] Gravity Engine (FAC & Bouguer)")
-    print(f"{Fore.GREEN}[2] Resistivity Engine (Schlumberger)")
-    print(f"{Fore.GREEN}[3] Visualizer (Generate Plots)")
-    print(f"{Fore.GREEN}[4] Auto-Sync (GitHub & WhatsApp)")
-    print(Fore.RED}[0] Exit System")
+    print(Fore.GREEN + "[1] Gravity Engine (FAC & Bouguer)")
+    print(Fore.GREEN + "[2] Resistivity Engine (Schlumberger)")
+    print(Fore.GREEN + "[3] Visualizer (Generate Plots)")
+    print(Fore.GREEN + "[4] Auto-Sync (GitHub & WhatsApp)")
+    print(Fore.RED + "[0] Exit System")
     print(Fore.CYAN + "------------------------------------------")
     return input("Select Option: ")
 
 def run_system():
-    # Load semua engine
+    # Load semua engine dari folder core
     grav = GravityEngine()
     res = ResistivityEngine()
     viz = VisualizerEngine()
@@ -41,24 +41,26 @@ def run_system():
         if choice == '1':
             print(Fore.YELLOW + "\n[*] Running Gravity Engine...")
             try:
+                # Input data untuk perhitungan Geofisika
                 h = float(input("Enter Elevation (m): "))
                 g_obs = float(input("Enter Observed Gravity (mGal): "))
                 g_theo = float(input("Enter Theoretical Gravity (mGal): "))
-                rho = float(input("Enter Density (default 2.67): ") or 2.67)
+                rho_val = input("Enter Density (default 2.67): ")
+                rho = float(rho_val) if rho_val else 2.67
 
-                # Hitung koreksi dari engine
+                # Memanggil fungsi dari core/gravity_engine.py
                 fac = grav.calculate_fac(h)
                 bc = grav.calculate_bc(h, rho)
-                
-                # Hitung Anomali menggunakan method baru di engine
                 sba = grav.get_complete_anomaly(g_obs, g_theo, fac, bc)
 
-                print("-" * 35)
+                print(Fore.CYAN + "-" * 35)
                 print(f"Result -> FAC: {fac:.4f}, BC: {bc:.4f}")
-                print(Fore.GREEN + f"RESULT -> SBA: {sba:.4f} mGal")
-                print("-" * 35)
+                print(Fore.GREEN + Style.BRIGHT + f"RESULT -> SBA: {sba:.4f} mGal")
+                print(Fore.CYAN + "-" * 35)
             except ValueError:
                 print(Fore.RED + "[!] Error: Masukkan angka yang valid!")
+            except Exception as e:
+                print(Fore.RED + f"[!] Unexpected Error: {e}")
             
             input("\nPress Enter to return...")
 
@@ -70,16 +72,20 @@ def run_system():
                 v = float(input("Voltage (V): "))
                 i = float(input("Current (A): "))
                 k = res.calculate_k_schlumberger(ab2, mn2)
-                rho = res.calculate_apparent_resistivity(k, v, i)
-                print(f"Result -> K: {k:.2f}, Rho_a: {rho:.2f} Ohm.m")
+                rho_a = res.calculate_apparent_resistivity(k, v, i)
+                print(Fore.CYAN + "-" * 35)
+                print(f"Result -> K: {k:.2f}")
+                print(Fore.GREEN + Style.BRIGHT + f"Rho_a: {rho_a:.2f} Ohm.m")
+                print(Fore.CYAN + "-" * 35)
             except ValueError:
                 print(Fore.RED + "[!] Error: Masukkan angka yang valid!")
             input("\nPress Enter to return...")
 
         elif choice == '3':
             print(Fore.YELLOW + "\n[*] Generating Default Plots...")
+            # Simulasi data dummy
             viz.plot_gravity_anomaly([1,2,3,4,5], [10,12,15,11,9])
-            print(Fore.GREEN + "[+] Plots saved in /results")
+            print(Fore.GREEN + "[+] Plots successfully saved in /results")
             input("\nPress Enter to return...")
 
         elif choice == '4':
@@ -87,6 +93,7 @@ def run_system():
             sync.local_backup()
             bot.send_notification("Data processing complete. Results synced to TITANCORE.", "Auto-Sync")
             sync.push_to_git("Field data update")
+            print(Fore.GREEN + "[+] Sync completed!")
             input("\nPress Enter to return...")
 
         elif choice == '0':
