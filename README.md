@@ -1,6 +1,6 @@
 # 🛰️ GeoStream-Automata v1.1
 > **Advanced Geophysical Automation System for Mobile & Desktop**
-> Developed with ❤️ by **Ivan Krisopras Hutabarat** (Teknik Geofisika ITERA)
+> Developed by **Ivan Krisopras Hutabarat** (Teknik Geofisika ITERA)
 
 ![Python](https://img.shields.io/badge/Python-3.x-blue?style=for-the-badge&logo=python)
 ![Geophysics](https://img.shields.io/badge/Focus-Geophysics-green?style=for-the-badge)
